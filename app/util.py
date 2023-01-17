@@ -19,7 +19,42 @@ def CompareSimilarlyListWithHandmade(similaryList, handmadeList):
                 else: result.append(0)
         return result, (ok_sum/(ok_sum + miss_num))*100
 
+def single_to_figure(lists, figure_time_list):
+    data_length = len(lists)
+    x1 = figure_time_list
+    y1 = lists
 
+
+    # Figureの初期化
+    fig = plt.figure(figsize=(12, 5)) #...1
+
+    #図の形式定義
+    plt.rcParams['font.family'] ='Hiragino Maru Gothic Pro'#使用するフォント
+    plt.rcParams['xtick.direction'] = 'in'#x軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
+    plt.rcParams['ytick.direction'] = 'in'#y軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
+    plt.rcParams['xtick.major.width'] = 1.0#x軸主目盛り線の線幅
+    plt.rcParams['ytick.major.width'] = 1.0#y軸主目盛り線の線幅
+    plt.rcParams['font.size'] = 19 #フォントの大きさ
+    plt.rcParams['axes.linewidth'] = 1.0# 軸の線幅edge linewidth。囲みの太さ
+    
+    label_l = ['', 'systemOnly', 'handmadeOnly', '(0,0)', '(1,1)']
+
+    ax = fig.add_subplot(1, 1, 1)#(行，列，領域番号)
+    ax.plot(x1, y1,c="blue",label='Estimated Part',linewidth=0.8)
+    ax.set_xlabel('Time[s]',fontsize=22)
+#     ax.set_ylabel('acc')
+#     ax.set_xlim((0,14000))
+    ax.set_ylim((0, 3.5))
+    ax.set_title("body",fontsize=26)
+    # ax.set_title("tf-idf method",fontsize=26)
+    ax.yaxis.set_major_locator(mpl.ticker.IndexLocator(1, -1))
+    ax.set_yticklabels(label_l, ha='right',fontsize=22)
+    # ax.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', fontsize=19)
+
+
+
+    plt.tight_layout()#グラフが重ならず，設定した図のサイズ内に収まる。
+    plt.show()
 
 def enlarge_sentence(sentence: list, length: int) -> list:
         return [num for num in sentence for _ in range(length)]
@@ -27,7 +62,7 @@ def enlarge_sentence(sentence: list, length: int) -> list:
 
 
 def to_figure(figure_time_list, rulebase_estimated_part,tfidf_estimated_part, concious_part):
-    data_length = len(rulebase_estimated_part)
+    # data_length = len(rulebase_estimated_part)
     # figure_time_list = []
     # for i in range(data_length):
         # figure_time_list.append(i * 16 * Music.quarter_count / 100)
@@ -44,13 +79,13 @@ def to_figure(figure_time_list, rulebase_estimated_part,tfidf_estimated_part, co
     fig = plt.figure(figsize=(12, 5)) #...1
 
     #図の形式定義
-    # plt.rcParams['font.family'] ='Yu Gothic'#使用するフォント
-    # plt.rcParams['xtick.direction'] = 'in'#x軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
-    # plt.rcParams['ytick.direction'] = 'in'#y軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
-    # plt.rcParams['xtick.major.width'] = 1.0#x軸主目盛り線の線幅
-    # plt.rcParams['ytick.major.width'] = 1.0#y軸主目盛り線の線幅
-    # plt.rcParams['font.size'] = 19 #フォントの大きさ
-    # plt.rcParams['axes.linewidth'] = 1.0# 軸の線幅edge linewidth。囲みの太さ
+    plt.rcParams['font.family'] ='Hiragino Maru Gothic Pro'#使用するフォント
+    plt.rcParams['xtick.direction'] = 'in'#x軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
+    plt.rcParams['ytick.direction'] = 'in'#y軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
+    plt.rcParams['xtick.major.width'] = 1.0#x軸主目盛り線の線幅
+    plt.rcParams['ytick.major.width'] = 1.0#y軸主目盛り線の線幅
+    plt.rcParams['font.size'] = 19 #フォントの大きさ
+    plt.rcParams['axes.linewidth'] = 1.0# 軸の線幅edge linewidth。囲みの太さ
     
 #     label_l = ['','drum', 'melody', 'vocal']
     label_l = ['None', 'drum', 'melody', 'vocal']

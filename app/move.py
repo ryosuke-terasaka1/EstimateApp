@@ -37,6 +37,7 @@ class Move():
         self.Accel.accel_find_pose_timing()
         self.Kinect.kinect_find_pose_timing()
 
+        # self.partsList = [self.Accel.RH, self.Accel.RF, self.Accel.LH, self.Accel.LF, self.Kinect.RE, self.Kinect.RK, self.Kinect.LE, self.Kinect.LK]
         self.partsList = [self.Accel.RH, self.Accel.RF, self.Accel.LH, self.Accel.LF, self.Kinect.RE, self.Kinect.RK, self.Kinect.LE, self.Kinect.LK, self.Kinect.RP, self.Kinect.LP]
         # self.RE = self.kinect_timing_move()
         # for i in range(7):
@@ -53,8 +54,8 @@ class Move():
 
         sort_list = []
         f_sort_list = []
-        for i in range(9+2):
-            for j in range(i+1, 10+2):
+        for i in range(len(self.partsList)+1):
+            for j in range(i+1, len(self.partsList)+2):
                 similarlyBody = self.partToBody_minMax(i, j)
                 body_accuracy_graph, body_accuracy_num = util.CompareSimilarlyListWithHandmade(similarlyBody, body)
                 f = f1_score(similarlyBody, body)*100
@@ -65,7 +66,7 @@ class Move():
                 # single_to_figure(body_accuracy_graph)
         sort_list.sort(reverse=True)
         f_sort_list.sort(reverse=True)
-        print(sort_list)
-        print(f_sort_list)
+        print('sort_list: ', sort_list)
+        print('f_sort_list', f_sort_list)
         
-        self.pose_timing = self.partToBody(2)
+        self.pose_timing = self.partToBody_minMax(3, 11)

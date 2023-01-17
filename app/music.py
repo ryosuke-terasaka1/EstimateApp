@@ -2,6 +2,8 @@ from typing import List
 import librosa
 import librosa.display
 import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
 class Music():
@@ -27,8 +29,8 @@ class Music():
         hop_length = frame_length // 4
         rms = librosa.feature.rms(y, frame_length=frame_length, hop_length=hop_length, center=True)
 
-        print(f'rms.shape: {rms.shape}')
-        print(f'rms.shape[1] = y.shape[0] // hop_length + 1 = {y.shape[0]} // {hop_length} + 1 = {y.shape[0] // hop_length + 1}')
+        # print(f'rms.shape: {rms.shape}')
+        # print(f'rms.shape[1] = y.shape[0] // hop_length + 1 = {y.shape[0]} // {hop_length} + 1 = {y.shape[0] // hop_length + 1}')
 
         onset_envelope = rms[0, 1:] - rms[0, :-1]
         onset_envelope = np.maximum(0.0, onset_envelope)
@@ -43,7 +45,7 @@ class Music():
         onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
 
         times = librosa.times_like(onset_envelope, sr=sr)
-        print(times)
+        # print(times)
 
         half_timing = [0 for _ in range(self.music_half_count_length)]
 

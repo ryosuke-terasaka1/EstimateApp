@@ -17,7 +17,7 @@ class Kinect():
         kinect_names.append(name + "_Z")
     kinect_names.append("")
 
-    def __init__(self, Music, kinect_file, kinect_start_timing):
+    def __init__(self, Music: Music, kinect_file, kinect_start_timing):
         self.kinect_file: str = kinect_file
         self.Music = Music
         self.kinect_start_timing = kinect_start_timing
@@ -88,8 +88,8 @@ class Kinect():
         return ELBOW_RIGHT_degree, KNEE_RIGHT_degree, ELBOW_LEFT_degree, KNEE_LEFT_degree, PEL_RIGHT_degree, PEL_LEFT_degree
 
 
-    def kinect_timing_move(self, kinect_data, start_timing, small_threshold, large_threshold):
-        kinect_data = kinect_data[start_timing:]   # 開始タイミング
+    def kinect_timing_move(self, kinect_data, small_threshold, large_threshold):
+        kinect_data = kinect_data[self.kinect_start_timing:]   # 開始タイミング
         small_data_kind = [180 - data for data in kinect_data]
         
         large_data_kind = kinect_data
@@ -98,19 +98,34 @@ class Kinect():
         
         half_timing = [0 for _ in range(self.Music.music_half_count_length)]
         
-        peak_time = []
+        ans = [0 for _ in range(self.Music.music_half_count_length)]
+    #     timing 
+        large_peak_time = []
+        small_peak_time = []
         for i in large_peaks:
             time = float(i/30)
-            peak_time.append(time)
+            large_peak_time.append(time)
         for i in small_peaks:
             time = float(i/30)
-            peak_time.append(time)
-        for i in peak_time:
+            small_peak_time.append(time)
+        for i in large_peak_time:
             for j in range(1, len(self.Music.half_count_list)-1):
                 if self.Music.half_count_list[j] <= i < self.Music.half_count_list[j+1]:
                     half_timing[j] = 1
 
-        return half_timing
+        for i in small_peak_time:
+            for j in range(1, len(self.Music.half_count_list)-1):
+                if self.Music.half_count_list[j] <= i < self.Music.half_count_list[j+1]:
+                    half_timing[j] -= 1
+                    
+        print(half_timing)
+
+        for i in range(len(half_timing)-1):
+            if abs(half_timing[i]-half_timing[i+1]) >= 2:
+                ans[i] = 1
+
+
+        return ans
 
     
     def find_pose_timing_from_kinect(self, kinect_data, differ):
@@ -144,9 +159,16 @@ class Kinect():
     
     def kinect_find_pose_timing(self):
         RE, RK, LE, LK, RP, LP = self.degree()
-        self.RE = self.kinect_timing_move_diff(RE, 3)
-        self.RK = self.kinect_timing_move_diff(RK, 3)
-        self.LE = self.kinect_timing_move_diff(LE, 3)
-        self.LK = self.kinect_timing_move_diff(LK, 3)
-        self.RP = self.kinect_timing_move_diff(RP, 3)
-        self.LP = self.kinect_timing_move_diff(LP, 3)
+        self.RE = self.kinect_timing_move(RE, 0, 135)
+        self.RK = self.kinect_timing_move(RK, 0, 120)
+        self.LE = self.kinect_timing_move(LE, 0, 135)
+        self.LK = self.kinect_timing_move(LK, 0, 120)
+        self.RP = self.kinect_timing_move(RP, 10, 180)
+        self.LP = self.kinect_timing_move(LP, 10, 180)
+
+        # self.RE = self.kinect_timing_move_diff(RE, 3)
+        # self.RK = self.kinect_timing_move_diff(RK, 3)
+        # self.LE = self.kinect_timing_move_diff(LE, 3)
+        # self.LK = self.kinect_timing_move_diff(LK, 3)
+        # self.RP = self.kinect_timing_move_diff(RP, 3)
+        # self.LP = self.kinect_timing_move_diff(LP, 3)
