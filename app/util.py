@@ -3,21 +3,22 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 def CompareSimilarlyListWithHandmade(similaryList, handmadeList):
-        result = []
-        ok_sum = 0
-        miss_num = 0
-        for similarly, handmade in zip(similaryList, handmadeList):
-            if similarly == handmade:
-                ok_sum += 1
-                if similarly == 1:
-                    result.append(3)
-                else: result.append(2)
-            else:
-                miss_num += 1
-                if handmade == 1:
-                    result.append(1)
-                else: result.append(0)
-        return result, (ok_sum/(ok_sum + miss_num))*100
+    result = []
+    ok_sum = 0
+    miss_num = 0
+    for similarly, handmade in zip(similaryList, handmadeList):
+        if similarly == handmade:
+            ok_sum += 1
+            if similarly == 1:
+                result.append(3)
+            else: result.append(2)
+        else:
+            miss_num += 1
+            if handmade == 1:
+                result.append(1)
+            else: result.append(0)
+    return result, (ok_sum/(ok_sum + miss_num))*100
+    
 
 def single_to_figure(lists, figure_time_list):
     data_length = len(lists)
