@@ -52,21 +52,21 @@ class Move():
         #     print('精度: ', body_accuracy_num, 'threshold: ', i)
         #     single_to_figure(body_accuracy_graph)
 
-        sort_list = []
-        f_sort_list = []
-        for i in range(len(self.partsList)+1):
-            for j in range(i+1, len(self.partsList)+2):
-                similarlyBody = self.partToBody_minMax(i, j)
-                body_accuracy_graph, body_accuracy_num = util.CompareSimilarlyListWithHandmade(similarlyBody, body)
-                f = f1_score(similarlyBody, body)*100
-                # print(body_accuracy_graph)
-                sort_list.append([body_accuracy_num, i, j])
-                f_sort_list.append([f, i, j])
-                # print('精度: ', body_accuracy_num, 'min: ', i, 'max: ', j)
-                # single_to_figure(body_accuracy_graph)
-        sort_list.sort(reverse=True)
-        f_sort_list.sort(reverse=True)
-        print('sort_list: ', sort_list)
-        print('f_sort_list', f_sort_list)
+        # sort_list = []
+        # f_sort_list = []
+        # for i in range(len(self.partsList)+1):
+        #     for j in range(i+1, len(self.partsList)+2):
+        #         similarlyBody = self.partToBody_minMax(i, j)
+        #         body_accuracy_graph, body_accuracy_num = util.CompareSimilarlyListWithHandmade(similarlyBody, body)
+        #         f = f1_score(similarlyBody, body)*100
+        #         # print(body_accuracy_graph)
+        #         sort_list.append([body_accuracy_num, i, j])
+        #         f_sort_list.append([f, i, j])
+        #         # print('精度: ', body_accuracy_num, 'min: ', i, 'max: ', j)
+        #         # single_to_figure(body_accuracy_graph)
+        # sort_list.sort(reverse=True)
+        # f_sort_list.sort(reverse=True)
+        # print('sort_list: ', sort_list)
+        # print('f_sort_list', f_sort_list)
         
         self.pose_timing = self.partToBody_minMax(3, 11)

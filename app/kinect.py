@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
 from music import Music
+import matplotlib.pyplot as plt
 
 class Kinect():
     
@@ -96,7 +97,7 @@ class Kinect():
         large_peaks, _ = find_peaks(large_data_kind, height=large_threshold)
         small_peaks, _ = find_peaks(small_data_kind, height=(180-small_threshold))
         
-        half_timing = [0 for _ in range(self.Music.music_half_count_length)]
+        half_timing = [[0, 0] for _ in range(self.Music.music_half_count_length)]
         
         ans = [0 for _ in range(self.Music.music_half_count_length)]
     #     timing 
@@ -111,17 +112,17 @@ class Kinect():
         for i in large_peak_time:
             for j in range(1, len(self.Music.half_count_list)-1):
                 if self.Music.half_count_list[j] <= i < self.Music.half_count_list[j+1]:
-                    half_timing[j] = 1
+                    half_timing[j][0] = 1
 
         for i in small_peak_time:
             for j in range(1, len(self.Music.half_count_list)-1):
                 if self.Music.half_count_list[j] <= i < self.Music.half_count_list[j+1]:
-                    half_timing[j] -= 1
+                    half_timing[j][1] = 1
                     
         print(half_timing)
 
         for i in range(len(half_timing)-1):
-            if abs(half_timing[i]-half_timing[i+1]) >= 2:
+            if [half_timing[i], half_timing[i+1]] in [[[1, 0], [0, 1]], [[1,0],[0,0]], [[0, 1], [1, 0]], [[0, 1], [0, 0]]]:
                 ans[i] = 1
 
 
@@ -159,12 +160,12 @@ class Kinect():
     
     def kinect_find_pose_timing(self):
         RE, RK, LE, LK, RP, LP = self.degree()
-        self.RE = self.kinect_timing_move(RE, 0, 135)
-        self.RK = self.kinect_timing_move(RK, 0, 120)
-        self.LE = self.kinect_timing_move(LE, 0, 135)
-        self.LK = self.kinect_timing_move(LK, 0, 120)
-        self.RP = self.kinect_timing_move(RP, 10, 180)
-        self.LP = self.kinect_timing_move(LP, 10, 180)
+        self.RE = self.kinect_timing_move(RE, 90, 105)
+        self.RK = self.kinect_timing_move(RK, 0, 90)
+        self.LE = self.kinect_timing_move(LE, 0, 120)
+        self.LK = self.kinect_timing_move(LK, 0, 140)
+        self.RP = self.kinect_timing_move(RP, 0, 110)
+        self.LP = self.kinect_timing_move(LP, 90, 90)
 
         # self.RE = self.kinect_timing_move_diff(RE, 3)
         # self.RK = self.kinect_timing_move_diff(RK, 3)
@@ -172,3 +173,23 @@ class Kinect():
         # self.LK = self.kinect_timing_move_diff(LK, 3)
         # self.RP = self.kinect_timing_move_diff(RP, 3)
         # self.LP = self.kinect_timing_move_diff(LP, 3)
+        
+
+    def find_start_timing(self, data):
+        peaks, _ = find_peaks(data, height=0)
+        print(peaks[:50])
+        plt.plot(data)
+        # plt.plot(peaks, data[peaks], "x")
+        # plt.plot(np.zeros_like(data), "--", color="gray")
+        plt.show()
+        
+    def kinect_find_start_timing(self):
+        RE, RK, LE, LK, RP, LP = self.degree()
+        print('右肘: ')
+        self.find_start_timing(RE)
+        print('右膝: ')
+        self.find_start_timing(RK)
+        print('左肘: ')
+        self.find_start_timing(LE)
+        print('左膝: ')
+        self.find_start_timing(LK)

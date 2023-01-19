@@ -51,7 +51,7 @@ class Music():
 
         index = 0
         for i in range(len(self.half_count_list)-1):
-            if self.half_count_list[i] <= times[onset_frames[index]] < self.half_count_list[i+1]:
+            if index < len(onset_frames) and self.half_count_list[i] <= times[onset_frames[index]] < self.half_count_list[i+1]:
                 half_timing[i] = 1
                 while index < len(onset_frames) and times[onset_frames[index]] < self.half_count_list[i+1]:
                     index += 1
@@ -94,7 +94,7 @@ class Music():
 
         index = 0
         for i in range(len(self.half_count_list)-1):
-            if self.half_count_list[i] <= times[onset_frames[index]] < self.half_count_list[i+1]:
+            if index < len(onset_frames) and self.half_count_list[i] <= times[onset_frames[index]] < self.half_count_list[i+1]:
                 half_timing[i] = 1
                 while index < len(onset_frames) and times[onset_frames[index]] < self.half_count_list[i+1]:
                     index += 1
@@ -108,7 +108,7 @@ class Music():
         hop_length = frame_length // 4
         onset_frames = librosa.onset.onset_detect(y, sr=sr, hop_length=hop_length)
         times = librosa.frames_to_time(onset_frames, sr=sr, hop_length=hop_length)
-        # print(times)
+        print(times[:50])
         fig = plt.figure(figsize=(6.4, 4.8/2))
         ax = fig.add_subplot()
         librosa.display.waveshow(y, sr=sr)
@@ -118,19 +118,18 @@ class Music():
         plt.tight_layout()
         plt.show()
 
-        half_timing = [0 for _ in range(self.music_half_count_length)]
-
-        index = 0
-        for i in range(len(self.half_count_list)-1):
-            if self.half_count_list[i] <= times[index] < self.half_count_list[i+1]:
-                half_timing[i] = 1
-                while index < len(onset_frames) and times[index] < self.half_count_list[i+1]:
-                    index += 1
-        return half_timing
-
 
 
     def find_onset(self):
         self.melody_onset = self._find_onset_RMS(self.file_name_list[0])
         self.vocal_onset = self._find_onset_RMS(self.file_name_list[1])
         self.drum_onset = self._find_onset_RMS(self.file_name_list[2])
+        
+
+    def music_find_start_timing(self):
+        print('メロディ')
+        self._find_onset_librosa(self.file_name_list[0])
+        print('ボーカル')
+        self._find_onset_librosa(self.file_name_list[1])
+        print('ドラム')
+        self._find_onset_librosa(self.file_name_list[2])

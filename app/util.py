@@ -20,7 +20,7 @@ def CompareSimilarlyListWithHandmade(similaryList, handmadeList):
     return result, (ok_sum/(ok_sum + miss_num))*100
     
 
-def single_to_figure(lists, figure_time_list):
+def single_to_figure(title, lists, figure_time_list):
     data_length = len(lists)
     x1 = figure_time_list
     y1 = lists
@@ -46,7 +46,7 @@ def single_to_figure(lists, figure_time_list):
 #     ax.set_ylabel('acc')
 #     ax.set_xlim((0,14000))
     ax.set_ylim((0, 3.5))
-    ax.set_title("body",fontsize=26)
+    ax.set_title(title,fontsize=26)
     # ax.set_title("tf-idf method",fontsize=26)
     ax.yaxis.set_major_locator(mpl.ticker.IndexLocator(1, -1))
     ax.set_yticklabels(label_l, ha='right',fontsize=22)
@@ -62,7 +62,7 @@ def enlarge_sentence(sentence: list, length: int) -> list:
 
 
 
-def to_figure(figure_time_list, rulebase_estimated_part,tfidf_estimated_part, concious_part):
+def to_figure(title, figure_time_list, rulebase_estimated_part,tfidf_estimated_part, concious_part):
     # data_length = len(rulebase_estimated_part)
     # figure_time_list = []
     # for i in range(data_length):
@@ -119,6 +119,8 @@ def to_figure(figure_time_list, rulebase_estimated_part,tfidf_estimated_part, co
     ax.set_yticklabels(label_l, ha='right',fontsize=22)
     ax.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left',fontsize=19)
 
-    figname = 'uww2021_dataA_3.pdf'
+    figname = title + '_result.pdf'
     plt.tight_layout()#グラフが重ならず，設定した図のサイズ内に収まる。
-    plt.savefig(figname)
+    plt.show()
+    # plt.savefig(title=figname)
+    

@@ -3,6 +3,7 @@ import math
 from music import Music
 from scipy.signal import find_peaks
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Accel():
@@ -64,3 +65,35 @@ class Accel():
         self.RF = self.accel_timing_move(self.accel_file_list[1], 400)
         self.LH = self.accel_timing_move(self.accel_file_list[2], 100)
         self.LF = self.accel_timing_move(self.accel_file_list[3], 400)
+        
+
+    def find_start_timing(self, file_name):
+        df = pd.read_csv(file_name, header = None, usecols=[3, 4, 5])
+        df.columns = ["x", "y", "z"]
+#         print(df)
+        composite = []
+        for i in range(len(df)):
+            x_value = float(df["x"][i] ** 2)
+            y_value = float(df["y"][i] ** 2)
+            z_value = float(df["z"][i] ** 2)
+            composite_value = math.sqrt(x_value + y_value + z_value)
+            composite.append(composite_value)
+
+        accel_data = np.array(composite)
+        accel_data = np.ndarray.flatten(accel_data)
+        peaks, _ = find_peaks(accel_data, height=1200)
+        print(peaks[:50])
+        plt.plot(accel_data)
+        plt.plot(peaks, accel_data[peaks], "x")
+        plt.plot(np.zeros_like(accel_data), "--", color="gray")
+        plt.show()
+        
+    def accel_find_start_timing(self):
+        print('右手: ')
+        self.find_start_timing(self.accel_file_list[0])
+        print('右足: ')
+        self.find_start_timing(self.accel_file_list[1])
+        print('左手: ')
+        self.find_start_timing(self.accel_file_list[2])
+        print('左足: ')
+        self.find_start_timing(self.accel_file_list[3])

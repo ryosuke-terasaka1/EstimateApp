@@ -45,9 +45,9 @@ class EstimatePart():
         print('v-m-d', vo_num, me_num, dr_num)
         figure_time_list = [i * 16 * self.Music.quarter_count / 100 for i in range(len(vo_re))]
 
-        util.single_to_figure(vo_re, figure_time_list)
-        util.single_to_figure(me_re, figure_time_list)
-        util.single_to_figure(dr_re, figure_time_list)
+        util.single_to_figure('ポーズとボーカルの重複タイミング', vo_re, figure_time_list)
+        util.single_to_figure('ポーズとメロディの重複タイミング',me_re, figure_time_list)
+        util.single_to_figure('ポーズとドラムの重複タイミング',dr_re, figure_time_list)
 
     def evaluate_RuleBase(self):
         to_int_dic = {'ボーカル': 3, 'メロディ': 2, 'ドラム': 1, 'None': 0}
@@ -181,6 +181,7 @@ class EstimatePart():
         figure_time_list = [i * 16 * self.Music.quarter_count / 100 for i in range(len(enl_accuracy_data))]
 
         util.to_figure(
+            'ルールベースとtf/idfの結果', 
             figure_time_list,
             enl_rulebase_estimate,
             enl_tfIdf_estimate,
