@@ -2,7 +2,6 @@ from music import Music
 from move import Move
 import util
 from typing import List
-from data_py.A_1_1csv_data import similarly_vocal, similarly_melody, similarly_drum
 
 class EstimatePart():
     def __init__(self, Music: Music, Move: Move, rule_list: List[str], rule_length_list, accuracy_list):
@@ -39,15 +38,15 @@ class EstimatePart():
         self.melody_dupTiming = self.CreateSimilarlyList(self.Move.pose_timing, self.Music.melody_onset)
         self.drum_dupTiming = self.CreateSimilarlyList(self.Move.pose_timing, self.Music.drum_onset)
         
-        vo_re, vo_num = util.CompareSimilarlyListWithHandmade(self.vocal_dupTiming, similarly_vocal)
-        me_re, me_num = util.CompareSimilarlyListWithHandmade(self.melody_dupTiming, similarly_melody)
-        dr_re, dr_num = util.CompareSimilarlyListWithHandmade(self.drum_dupTiming, similarly_drum)
-        print('v-m-d', vo_num, me_num, dr_num)
+        vo_re, self.vo_num = util.CompareSimilarlyListWithHandmade(self.vocal_dupTiming, self.Move.SimilarlyVocal)
+        me_re, self.me_num = util.CompareSimilarlyListWithHandmade(self.melody_dupTiming, self.Move.SimilarlyMelody)
+        dr_re, self.dr_num = util.CompareSimilarlyListWithHandmade(self.drum_dupTiming, self.Move.SimilarlyDrum)
+        # print('v-m-d', vo_num, me_num, dr_num)
         figure_time_list = [i * 16 * self.Music.quarter_count / 100 for i in range(len(vo_re))]
 
-        util.single_to_figure('ポーズとボーカルの重複タイミング', vo_re, figure_time_list)
-        util.single_to_figure('ポーズとメロディの重複タイミング',me_re, figure_time_list)
-        util.single_to_figure('ポーズとドラムの重複タイミング',dr_re, figure_time_list)
+        # util.single_to_figure('ポーズとボーカルの重複タイミング', vo_re, figure_time_list)
+        # util.single_to_figure('ポーズとメロディの重複タイミング',me_re, figure_time_list)
+        # util.single_to_figure('ポーズとドラムの重複タイミング',dr_re, figure_time_list)
 
     def evaluate_RuleBase(self):
         to_int_dic = {'ボーカル': 3, 'メロディ': 2, 'ドラム': 1, 'None': 0}
@@ -180,13 +179,13 @@ class EstimatePart():
         
         figure_time_list = [i * 16 * self.Music.quarter_count / 100 for i in range(len(enl_accuracy_data))]
 
-        util.to_figure(
-            'ルールベースとtf/idfの結果', 
-            figure_time_list,
-            enl_rulebase_estimate,
-            enl_tfIdf_estimate,
-            enl_accuracy_data
-            )
+        # util.to_figure(
+        #     'ルールベースとtf/idfの結果', 
+        #     figure_time_list,
+        #     enl_rulebase_estimate,
+        #     enl_tfIdf_estimate,
+        #     enl_accuracy_data
+        #     )
 
     def evaluate(self):
         self.find_dupTiming()

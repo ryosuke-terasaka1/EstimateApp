@@ -2,13 +2,17 @@ from accel import Accel
 from kinect import Kinect
 from sklearn.metrics import f1_score
 import util
-from data_py.A_1_1csv_data import body
+from typing import List
 
 
 class Move():
     def __init__(self, Accel: Accel, Kinect: Kinect):
         self.Accel = Accel
         self.Kinect = Kinect
+        self.SimilarlyVocal: List[int]
+        self.SimilarlyMelody: List[int]
+        self.SimilarlyDrum: List[int]
+        self.SimilarlyBodyPoseTiming: List[int]
 
     def partToBody(self, diff_threshold):
         result = []
@@ -57,8 +61,8 @@ class Move():
         # for i in range(len(self.partsList)+1):
         #     for j in range(i+1, len(self.partsList)+2):
         #         similarlyBody = self.partToBody_minMax(i, j)
-        #         body_accuracy_graph, body_accuracy_num = util.CompareSimilarlyListWithHandmade(similarlyBody, body)
-        #         f = f1_score(similarlyBody, body)*100
+        #         body_accuracy_graph, body_accuracy_num = util.CompareSimilarlyListWithHandmade(similarlyBody, self.Move.SimilarlyBodyPoseTiming)
+        #         f = f1_score(similarlyBody, self.Move.SimilarlyBodyPoseTiming)*100
         #         # print(body_accuracy_graph)
         #         sort_list.append([body_accuracy_num, i, j])
         #         f_sort_list.append([f, i, j])

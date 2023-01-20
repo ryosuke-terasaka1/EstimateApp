@@ -102,7 +102,7 @@ class Music():
 
 
     def _find_onset_librosa(self, file_name):
-        y, sr = librosa.load(file_name, offset=self.offset, duration=self.duration)
+        y, sr = librosa.load(file_name, offset=self.offset, duration=10)
 
         frame_length = 2048
         hop_length = frame_length // 4

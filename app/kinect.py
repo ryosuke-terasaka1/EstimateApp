@@ -89,7 +89,7 @@ class Kinect():
         return ELBOW_RIGHT_degree, KNEE_RIGHT_degree, ELBOW_LEFT_degree, KNEE_LEFT_degree, PEL_RIGHT_degree, PEL_LEFT_degree
 
 
-    def kinect_timing_move(self, kinect_data, small_threshold, large_threshold):
+    def kinect_timing_move(self, kinect_data, large_threshold, small_threshold):
         kinect_data = kinect_data[self.kinect_start_timing:]   # 開始タイミング
         small_data_kind = [180 - data for data in kinect_data]
         
@@ -119,7 +119,7 @@ class Kinect():
                 if self.Music.half_count_list[j] <= i < self.Music.half_count_list[j+1]:
                     half_timing[j][1] = 1
                     
-        print(half_timing)
+        # print(half_timing)
 
         for i in range(len(half_timing)-1):
             if [half_timing[i], half_timing[i+1]] in [[[1, 0], [0, 1]], [[1,0],[0,0]], [[0, 1], [1, 0]], [[0, 1], [0, 0]]]:
@@ -160,12 +160,12 @@ class Kinect():
     
     def kinect_find_pose_timing(self):
         RE, RK, LE, LK, RP, LP = self.degree()
-        self.RE = self.kinect_timing_move(RE, 90, 105)
-        self.RK = self.kinect_timing_move(RK, 0, 90)
-        self.LE = self.kinect_timing_move(LE, 0, 120)
-        self.LK = self.kinect_timing_move(LK, 0, 140)
-        self.RP = self.kinect_timing_move(RP, 0, 110)
-        self.LP = self.kinect_timing_move(LP, 90, 90)
+        self.RE = self.kinect_timing_move(RE, 105, 0)
+        self.RK = self.kinect_timing_move(RK, 90, 0)
+        self.LE = self.kinect_timing_move(LE, 120, 0)
+        self.LK = self.kinect_timing_move(LK, 140, 0)
+        self.RP = self.kinect_timing_move(RP, 110, 0)
+        self.LP = self.kinect_timing_move(LP, 100, 85)
 
         # self.RE = self.kinect_timing_move_diff(RE, 3)
         # self.RK = self.kinect_timing_move_diff(RK, 3)
@@ -177,7 +177,7 @@ class Kinect():
 
     def find_start_timing(self, data):
         peaks, _ = find_peaks(data, height=0)
-        print(peaks[:50])
+        print(peaks[:200])
         plt.plot(data)
         # plt.plot(peaks, data[peaks], "x")
         # plt.plot(np.zeros_like(data), "--", color="gray")
