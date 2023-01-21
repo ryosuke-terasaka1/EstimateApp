@@ -144,6 +144,7 @@ class EstimatePart():
             elif singleList == ['メロディ']: ans.append(2)
             elif singleList == ['ドラム']: ans.append(1)
             elif singleList == ['None']: ans.append(0)
+            else: ans.append(0)
         return ans
         
 
@@ -157,7 +158,7 @@ class EstimatePart():
     def _Score(self, exam, accuracy):
         plus = 0
         if len(exam) != len(accuracy):
-            return print('wrong length')
+            return print('wrong length', len(exam), len(accuracy))
         for i, j in zip(exam, accuracy):
             if i == j:
                 plus += 1

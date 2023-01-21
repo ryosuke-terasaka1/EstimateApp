@@ -45,6 +45,7 @@ class Music():
         onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
 
         times = librosa.times_like(onset_envelope, sr=sr)
+        # self.onset_num = len(times)
         # print(times)
 
         half_timing = [0 for _ in range(self.music_half_count_length)]
@@ -85,6 +86,8 @@ class Music():
         onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
 
         times = librosa.times_like(onset_envelope, sr=sr)
+        # self.onset_num = len(times)
+        # print('onset_num: ', len(times))
         # print(f'times: {times}, length: {len(times)}')
         # for frame in onset_frames:
         #     print(times[frame])
@@ -102,13 +105,32 @@ class Music():
 
 
     def _find_onset_librosa(self, file_name):
-        y, sr = librosa.load(file_name, offset=self.offset, duration=10)
+        y, sr = librosa.load(file_name, offset=self.offset, duration=self.duration)
 
         frame_length = 2048
         hop_length = frame_length // 4
         onset_frames = librosa.onset.onset_detect(y, sr=sr, hop_length=hop_length)
         times = librosa.frames_to_time(onset_frames, sr=sr, hop_length=hop_length)
-        print(times[:50])
+        index = 0
+
+        half_timing = [0 for _ in range(self.music_half_count_length)]
+        for i in range(len(self.half_count_list)-1):
+            if index < len(onset_frames) and self.half_count_list[i] <= times[index] < self.half_count_list[i+1]:
+                half_timing[i] = 1
+                while index < len(onset_frames) and times[index] < self.half_count_list[i+1]:
+                    index += 1
+
+        return half_timing
+
+
+    def _find_onset_num_librosa(self, file_name):
+        y, sr = librosa.load(file_name, offset=self.offset, duration=self.duration)
+
+        frame_length = 2048
+        hop_length = frame_length // 4
+        onset_frames = librosa.onset.onset_detect(y, sr=sr, hop_length=hop_length)
+        times = librosa.frames_to_time(onset_frames, sr=sr, hop_length=hop_length)
+        print(len(times))
         fig = plt.figure(figsize=(6.4, 4.8/2))
         ax = fig.add_subplot()
         librosa.display.waveshow(y, sr=sr)
@@ -118,18 +140,166 @@ class Music():
         plt.tight_layout()
         plt.show()
 
+    def _find_onset_num_mel(self):
+        part_name = ['melody', 'vocal', 'drum']
+        for i in range(len(self.file_name_list)):
+            y, sr = librosa.load(self.file_name_list[i], offset=self.offset, duration=self.duration)
+            win_length = 2048
+            hop_length = win_length // 4
+            n_fft = win_length
+            window = 'hann'
+            n_mels = 128
+            mel_power = librosa.feature.melspectrogram(y, sr=sr, n_fft=n_fft, hop_length=hop_length, win_length=win_length,
+                                                    window=window, center=True, n_mels=n_mels)
+            log_power = librosa.power_to_db(mel_power, ref=np.max)
+            onset_envelope = log_power[:, 1:] - log_power[:, :-1]
+            onset_envelope = np.mean(onset_envelope, axis=0)
+            onset_envelope = np.maximum(0.0, onset_envelope)
+            onset_envelope = onset_envelope / onset_envelope.max()
+            # frame_length = 2048
+            # hop_length = frame_length // 4
+            # rms = librosa.feature.rms(y, frame_length=frame_length, hop_length=hop_length, center=True)
+
+            # print(f'rms.shape: {rms.shape}')
+            # print(f'rms.shape[1] = y.shape[0] // hop_length + 1 = {y.shape[0]} // {hop_length} + 1 = {y.shape[0] // hop_length + 1}')
+
+            # onset_envelope = rms[0, 1:] - rms[0, :-1]
+            # onset_envelope = np.maximum(0.0, onset_envelope)
+            # onset_envelope = onset_envelope / onset_envelope.max()
+
+            pre_max = 30 / 1000 * sr // hop_length
+            post_max = 0 / 1000 * sr // hop_length + 1
+            pre_avg = 100 / 1000 * sr // hop_length
+            post_avg = 100 / 1000 * sr // hop_length + 1
+            wait = 30 / 1000 * sr // hop_length
+            delta = 0.07
+            onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
+
+            times = librosa.times_like(onset_envelope, sr=sr)
+
+            print(part_name[i], len(onset_frames))
+
+            fig = plt.figure(figsize=(6.4, 4.8))
+
+            ax1 = fig.add_subplot(2, 1, 1)
+            librosa.display.waveshow(y, sr=sr)
+            ax1.set_title('sound wave')
+
+            ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
+            ax2.plot(times, onset_envelope, label='onset envelope')
+            ax2.vlines(times[onset_frames], 0, 1, color='r', linestyle='--', label='onsets')
+            ax2.legend()
+            ax2.set_xlabel('Time')
+            ax2.set_title('onset envelope and onsets (rms)')
+
+            plt.tight_layout()
+            plt.show()
+
+
+    def _find_onset_num_rms(self):
+        part_name = ['melody', 'vocal', 'drum']
+        for i in range(len(self.file_name_list)):
+            y, sr = librosa.load(self.file_name_list[i], offset=self.offset, duration=self.duration)
+
+            frame_length = 2048
+            hop_length = frame_length // 4
+            rms = librosa.feature.rms(y, frame_length=frame_length, hop_length=hop_length, center=True)
+
+            print(f'rms.shape: {rms.shape}')
+            print(f'rms.shape[1] = y.shape[0] // hop_length + 1 = {y.shape[0]} // {hop_length} + 1 = {y.shape[0] // hop_length + 1}')
+
+            onset_envelope = rms[0, 1:] - rms[0, :-1]
+            onset_envelope = np.maximum(0.0, onset_envelope)
+            onset_envelope = onset_envelope / onset_envelope.max()
+
+            pre_max = 30 / 1000 * sr // hop_length
+            post_max = 0 / 1000 * sr // hop_length + 1
+            pre_avg = 100 / 1000 * sr // hop_length
+            post_avg = 100 / 1000 * sr // hop_length + 1
+            wait = 30 / 1000 * sr // hop_length
+            delta = 0.07
+            onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
+
+            times = librosa.times_like(onset_envelope, sr=sr)
+
+            print(part_name[i], len(onset_frames))
+
+            fig = plt.figure(figsize=(6.4, 4.8))
+
+            ax1 = fig.add_subplot(2, 1, 1)
+            librosa.display.waveshow(y, sr=sr)
+            ax1.set_title('sound wave')
+
+            ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
+            ax2.plot(times, onset_envelope, label='onset envelope')
+            ax2.vlines(times[onset_frames], 0, 1, color='r', linestyle='--', label='onsets')
+            ax2.legend()
+            ax2.set_xlabel('Time')
+            ax2.set_title('onset envelope and onsets (rms)')
+
+            plt.tight_layout()
+            plt.show()
+
+
+    def _find_onset_num_stft(self):
+        part_name = ['melody', 'vocal', 'drum']
+        for i in range(len(self.file_name_list)):
+            y, sr = librosa.load(self.file_name_list[i], offset=self.offset, duration=self.duration)
+
+            win_length = 2048
+            hop_length = win_length // 4
+            n_fft = win_length
+            window = 'hann'
+            stft = librosa.stft(y, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window, center=True)
+            amplitude = np.abs(stft)
+            log_power = librosa.amplitude_to_db(amplitude, ref=np.max)
+            onset_envelope = log_power[:, 1:] - log_power[:, :-1]
+            onset_envelope = np.mean(onset_envelope, axis=0)
+            onset_envelope = np.maximum(0.0, onset_envelope)
+            onset_envelope = onset_envelope / onset_envelope.max()
+
+            pre_max = 30 / 1000 * sr // hop_length
+            post_max = 0 / 1000 * sr // hop_length + 1
+            pre_avg = 100 / 1000 * sr // hop_length
+            post_avg = 100 / 1000 * sr // hop_length + 1
+            wait = 30 / 1000 * sr // hop_length
+            delta = 0.07
+            onset_frames = librosa.util.peak_pick(onset_envelope, pre_max, post_max, pre_avg, post_avg, delta, wait)
+
+            times = librosa.times_like(onset_envelope, sr=sr)
+
+            print(part_name[i], len(onset_frames))
+
+            fig = plt.figure(figsize=(6.4, 4.8))
+
+            ax1 = fig.add_subplot(2, 1, 1)
+            librosa.display.waveshow(y, sr=sr)
+            ax1.set_title('sound wave')
+
+            ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
+            ax2.plot(times, onset_envelope, label='onset envelope')
+            ax2.vlines(times[onset_frames], 0, 1, color='r', linestyle='--', label='onsets')
+            ax2.legend()
+            ax2.set_xlabel('Time')
+            ax2.set_title('onset envelope and onsets (rms)')
+
+            plt.tight_layout()
+            plt.show()
+
 
 
     def find_onset(self):
-        self.melody_onset = self._find_onset_RMS(self.file_name_list[0])
-        self.vocal_onset = self._find_onset_RMS(self.file_name_list[1])
-        self.drum_onset = self._find_onset_RMS(self.file_name_list[2])
+        self.melody_onset = self._find_onset_mel(self.file_name_list[0])
+        self.vocal_onset = self._find_onset_mel(self.file_name_list[1])
+        self.drum_onset = self._find_onset_mel(self.file_name_list[2])
+
+        
         
 
     def music_find_start_timing(self):
         print('メロディ')
-        self._find_onset_librosa(self.file_name_list[0])
+        self._find_onset_num_librosa(self.file_name_list[0])
         print('ボーカル')
-        self._find_onset_librosa(self.file_name_list[1])
+        self._find_onset_num_librosa(self.file_name_list[1])
         print('ドラム')
-        self._find_onset_librosa(self.file_name_list[2])
+        self._find_onset_num_librosa(self.file_name_list[2])
