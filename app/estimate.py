@@ -2,6 +2,7 @@ from music import Music
 from move import Move
 import util
 from typing import List
+from sklearn.metrics import f1_score
 
 class EstimatePart():
     def __init__(self, Music: Music, Move: Move, rule_list: List[str], rule_length_list, accuracy_list):
@@ -42,6 +43,9 @@ class EstimatePart():
         me_re, self.me_num = util.CompareSimilarlyListWithHandmade(self.melody_dupTiming, self.Move.SimilarlyMelody)
         dr_re, self.dr_num = util.CompareSimilarlyListWithHandmade(self.drum_dupTiming, self.Move.SimilarlyDrum)
         # print('v-m-d', vo_num, me_num, dr_num)
+        self.vo_num_f = f1_score(self.vocal_dupTiming, self.Move.SimilarlyVocal)
+        self.me_num_f = f1_score(self.melody_dupTiming, self.Move.SimilarlyMelody)
+        self.dr_num_f = f1_score(self.drum_dupTiming, self.Move.SimilarlyDrum)
         figure_time_list = [i * 16 * self.Music.quarter_count / 100 for i in range(len(vo_re))]
 
         # util.single_to_figure('ポーズとボーカルの重複タイミング', vo_re, figure_time_list)
@@ -91,8 +95,12 @@ class EstimatePart():
                         rule_base_list = [priority_rank[3]]
 
                 result.append(to_int_dic[rule_base_list[0]])
+                
+        self.rulebase_confusion_matrix = [[0, 0, 0] for _ in range(3)]
+
         for tmp, acc in zip(result, self.accuracy_list):
             if tmp == acc: score += 1
+            self.rulebase_confusion_matrix[3-acc][3-tmp] += 1
 
         accuracy = (score / len(result)) * 100
         self.RuleBase_accuracy = accuracy
@@ -144,7 +152,7 @@ class EstimatePart():
             elif singleList == ['メロディ']: ans.append(2)
             elif singleList == ['ドラム']: ans.append(1)
             elif singleList == ['None']: ans.append(0)
-            else: ans.append(0)
+            # else: ans.append(0)
         return ans
         
 
@@ -153,15 +161,18 @@ class EstimatePart():
         for start, length, interval in self.rule_length_list:
             ans += self._one_dimension_tfidf(self.vocal_dupTiming, self.melody_dupTiming, self.drum_dupTiming, start, length, interval)
         # print(ans, len(ans))
+        # print(ans)
         return self._DoubleListToIntList(ans)
 
     def _Score(self, exam, accuracy):
         plus = 0
         if len(exam) != len(accuracy):
             return print('wrong length', len(exam), len(accuracy))
+        self.tfidf_confusion_matrix = [[0, 0, 0] for _ in range(3)]
         for i, j in zip(exam, accuracy):
             if i == j:
                 plus += 1
+            self.tfidf_confusion_matrix[3-j][3-i] += 1
         return plus / len(exam)
 
     def evaluate_tfIdf(self):

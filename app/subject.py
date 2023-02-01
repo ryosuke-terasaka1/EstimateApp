@@ -19,7 +19,7 @@ class Subject():
         self.Estimate = EstimatePart
 
 
-    def Result(self):
+    def Exam3_Result(self):
         self.Move.find_pose_timimng()
         
         self.Estimate = EstimatePart(Music=self.Music, Move=self.Move, rule_list=self.RuleList, rule_length_list=self.LengthList, accuracy_list=self.Accuracy)

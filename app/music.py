@@ -289,9 +289,9 @@ class Music():
 
 
     def find_onset(self):
-        self.melody_onset = self._find_onset_mel(self.file_name_list[0])
-        self.vocal_onset = self._find_onset_mel(self.file_name_list[1])
-        self.drum_onset = self._find_onset_mel(self.file_name_list[2])
+        self.melody_onset = self._find_onset_RMS(self.file_name_list[0])
+        self.vocal_onset = self._find_onset_RMS(self.file_name_list[1])
+        self.drum_onset = self._find_onset_RMS(self.file_name_list[2])
 
         
         
